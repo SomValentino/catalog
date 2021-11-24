@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      labels:
+        app: catalog
+    spec:
+      containers:
+      - name: catalog
+        image: catalogipp.azurecr.io/catalog:v6
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        env:
+          - name: MongoDBSettings__Host
+            value: "mongodb-service"
+          - name: MongoDBSettings__Port
+            value: "27017"
+          - name: MongoDBSettings__Username
+            value: "mongoadmin"
+          - name: MongoDBSettings__Password
+            valueFrom:
+              secretKeyRef:
+                name: catalog-secrets
+                key: mongodb-password
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 80
+        readinessProbe:
+          httpGet: 
+            path: /health/ready
+            port: 80
+      imagePullSecrets:
+        - name:  acr-secret
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name:  catalog-service
+spec:
+  selector:
+    app:  catalog
+  type:  LoadBalancer
+  ports:
+  - name:  name-of-the-port
+    port:  80

@@ -1,0 +1,37 @@
+--- scale a deployment of pod
+kubectl scale deployment.apps/catalog-deployment --replicas=3
+
+--- get current Kubernetes context
+kubectl config current-context
+kubectl config get-contexts
+
+--- create image pull secrets for pulling images to azure cointainer registry
+kubectl create secret docker-registry acr-secret --docker-server={acr server} --docker-usename={acr-admin-username} --docker-password={acr-admin-password} --docker-email={azure subcription email}
+
+--- create password secrets
+kubectl create secret generic catalog-secrets --from-literal=mongodb-password='Pass#word1'
+
+--- get pod creating events 
+kubectl describe pod/catalog-deployment-5fb5bbcb65-9xzww
+
+--- get kubernetes services
+kubectl get svc
+
+--- get kubernetes horizontal auto scaler
+kubectl get hpa
+
+--- apply kubernetes deployment 
+kubectl apply -f \{path to kubenetes yaml files}
+
+--- delete kubernetes pod
+kubectl delete pod/catalog-deployment-5fbwz
+
+--- acr login on azure cointainer registry
+az acr login --name {name of acr}
+
+--- install azure kubernetes cli
+az aks install-cli
+
+--- get kubernetes credentials from azure kubernetes service
+az aks get-credentials --resource-group {resource group name} --name {cluster name}
+
